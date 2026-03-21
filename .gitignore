@@ -1,0 +1,9 @@
+# Tüm alt klasörlerdeki node_modules'ları engeller
+**/node_modules/
+
+# Derlenmiş dosyaları engeller
+**/dist/
+
+# Sistem dosyaları
+.DS_Store
+Thumbs.db
