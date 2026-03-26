@@ -7,8 +7,8 @@
     <div class="modal">
       <textarea v-model.trim="newNote" name="note" id="note" cols="30" rows="10"></textarea><!--özel v- fonksiyonlarında .trim falan kullanabiliyoz.-->
       <p v-if="errorMessage">{{ errorMessage }}</p>
-      <button @click="addNote()">Add Note</button>
-      <button @click="showModal = false" class="close">Close</button>
+      <button @click="addNote()">{{ editingNote ? "Update Note" : "Add" }}</button>
+      <button @click="showModal = false; editingNote = null; newNote = null" class="close">Close</button>
     </div>
   </div>
   <div class="container">
@@ -22,6 +22,7 @@
         :key="note.id"
         class="card" 
         :style="{backgroundColor: note.backgroundColor}"
+        @click="openEditModal(note)"
       >
         <p class="main-text">{{ note.text }}</p>
         <p class="date">{{ note.date.toLocaleDateString("tu-TR") }}</p>
@@ -37,6 +38,8 @@
   const newNote = ref(""); /**bunu direk burdan değiştirince textarea içinde gözüküyo */
   const errorMessage = ref("");//Boş not oluşturulmaması için hata mesajı
   const notes = ref([]);/**notları tutacak dizi tanımladık. */
+  const editingNote = ref(null);//not düzenleniyomu yoksa yeni not mu ekleniyo diye kontrol etmek için kullanıyoruz.
+  //const addNoteButtonName = ref("Add Note");//Not ekleme butonunu ismini değiştircez
 
   function getRandomColor() {//StackOverFlow'dan alınmış hazır renk oluşturma kodu
     return"hsl(" + Math.random() * 360 + ", 100%, 75%)";
@@ -47,6 +50,18 @@
     if(newNote.value.length < 4){
       return errorMessage.value = "Note needs to be 5 character or more";
     }
+
+    if(editingNote.value)
+    {
+      const note = notes.value.find(n => n.id === editingNote.value)
+
+        if(note) {
+          note.text = newNote.value
+          showModal.value = false
+        }
+      return
+    }
+
       
     notes.value.push({
       id: Math.floor(Math.random()* 1000000),/**her nota 0 ile 1 milyon arası id üretiyo */
@@ -56,7 +71,15 @@
     })
     showModal.value = false;
     newNote.value = "";
+    editingNote.value = null;
     errorMessage.value = ""
+  }
+
+  const openEditModal = (not) =>{
+    showModal.value = true
+    editingNote.value = not.id
+    newNote.value = not.text
+
   }
 </script>
 
